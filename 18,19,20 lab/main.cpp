@@ -14,25 +14,28 @@ int minCut(int V, vector<Edge> edges) {
     vector<int> parent(V + 1);
     for (int i = 1; i <= V; i++) parent[i] = i;
 
+    random_device rd;
+    mt19937 rng(rd());
+
     int remaining = V;
 
     while (remaining > 2) {
         if (edges.empty()) return 0;
 
-        int idx = 0;
+        uniform_int_distribution<int> dist(0, (int)edges.size() - 1);
+        int idx = dist(rng);
 
         int u = findParent(edges[idx].u, parent);
         int v = findParent(edges[idx].v, parent);
 
-        if (u == v) {
-            edges.erase(edges.begin());
-            continue;
-        }
+        if (u == v) continue;
 
         parent[v] = u;
         remaining--;
 
         vector<Edge> newEdges;
+        newEdges.reserve(edges.size());
+
         for (auto &e : edges) {
             int a = findParent(e.u, parent);
             int b = findParent(e.v, parent);
@@ -42,7 +45,7 @@ int minCut(int V, vector<Edge> edges) {
         edges.swap(newEdges);
     }
 
-    return edges.size();
+    return (int)edges.size();
 }
 
 int main() {
